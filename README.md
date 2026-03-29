@@ -64,37 +64,6 @@ FS(FS(FS(α)[a0])[a1])[a2]...
 
 ---
 
-# Expansion Rules
-
-To ensure consistency, we apply the following rules:
-
-### Rule 1 — Direct Expansion
-If the ordinal is expanded directly from the fixed base ordinal, no restriction is applied.
-
-Example:
-ε₀ → 1   (valid direct expansion)
-
----
-
-### Rule 2 — Monotonic Constraint
-Let:
-
-a = FS(b)[k]
-
-We only allow:
-
-FS(a)[i]
-
-if:
-
-FS(a)[i] > FS(b)[k-1]
-
-Notes:
-- Case k = 0 is excluded
-- Successor ordinals are not expandable
-
----
-
 # Interpretation
 
 Each encoded sequence represents:
