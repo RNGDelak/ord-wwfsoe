@@ -36,148 +36,29 @@ function encode(x) {
   return result;
 }
 
-function trimZeros(a) {
-  let i = a.length - 1;
-  while (i >= 0 && a[i].eq(0)) i--;
-  return a.slice(0, i + 1);
-}
 
-
-function isSuccessor(a) {
-  return a.length > 0 && !a[0].isZero();
-}
-
-function fundamentalSequence(a, n) {
-  let res = trimZeros(a.slice());
-
-  // ❌ successor → undefined
-  if (isSuccessor(res)) return undefined;
-
-  // find highest nonzero index
-  let k = res.length - 1;
-  while (k >= 0 && res[k].isZero()) k--;
-
-  if (k <= 0) return undefined; // not a limit ordinal
-
-  // Case A: coefficient > 1
-  if (res[k].gt(1)) {
-    res[k] = res[k].minus(1);
-    res[k - 1] = (res[k - 1] || new n.constructor(0)).plus(n);
-    return trimZeros(res);
-  }
-
-  // Case B: coefficient == 1
-  res[k] = new n.constructor(0);
-
-  if (k === 1) {
-    // ω → n
-    res[0] = n;
-    return trimZeros(res);
-  }
-
-  // ω^k → ω^(k-1) * n
-  res[k - 1] = n;
-  return trimZeros(res);
-}
+function fundamentalSequence(a, n) {}
 
 // =====================
-// Core: Extract ordinal coefficient
+// Core: Extract from number
 // =====================
 
-function getordinal(xInput) {
-  const x = new Decimal(xInput);
-
-  const xn = x.div(3);
-
-  const encoded = encode(xn);
-
-  const coeffs = new Array(encoded[0]).fill(0).concat(1);
-
-  return encoded
-}
+function getordinal(xInput) {}
 
 
 // =====================
 // Formatting helpers
 // =====================
 
-function formatTermHTML(k, power) {
-  if (power === 0) return k.toString();
-
-  if (power === 1) {
-    return k === 1 ? "ω" : `${k}ω`;
-  }
-
-  return k === 1
-    ? `ω<sup>${power}</sup>`
-    : `${k}ω<sup>${power}</sup>`;
-}
-
-
-function formatTermText(k, power) {
-  if (power === 0) return k.toString();
-
-  if (power === 1) {
-    return k.eq(1) ? "ω" : `${k}ω`;
-  }
-
-  return k.eq(1)
-    ? `ω^${power}`
-    : `${k}ω^${power}`;
-}
-
-
-// HTML version (uses <sup>)
-function toOrdinalfine(coeffs) {
-  const parts = [];
-
-  for (let i = coeffs.length - 1; i >= 0; i--) {
-    const k = parseInt(coeffs[i]);
-    if (k === 0) continue;
-
-    parts.push(formatTermHTML(k, i));
-  }
-
-  return parts.length ? parts.join(" + ") : "0";
-}
+// HTML ordinal
+function toOrdinalfine(coeffs) {}
 
 
 // Plain text version (uses ^)
-function toOrdinal(coeffs) {
-  const parts = [];
-
-  for (let i = coeffs.length - 1; i >= 0; i--) {
-    const k = coeffs[i];
-    if (k.eq(0)) continue;
-
-    parts.push(formatTermText(k, i));
-  }
-
-  return parts.length ? parts.join(" + ") : "0";
-}
+function toOrdinal(coeffs) {}
 
 // =====================
 // Classification
 // =====================
 
-function classifyOrdinal(coeffs) {
-  let nonZeroCount = 0;
-  let lastNonZeroIndex = -1;
-
-  for (let i = 0; i < coeffs.length; i++) {
-    if (coeffs[i].gt(0)) {
-      nonZeroCount++;
-      lastNonZeroIndex = i;
-    }
-  }
-
-  if (nonZeroCount === 0) return "cyan"; // 0
-
-  if (nonZeroCount === 1 && lastNonZeroIndex !== 0) {
-    return "yellow"; // ω^k
-  }
-
-  if (coeffs[0].gt(0)) return "white"; // successor
-
-  return "orange"; // limit ordinal
-}
+function classifyOrdinal(coeffs) {}
