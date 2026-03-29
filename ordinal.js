@@ -36,61 +36,69 @@ function encode(x) {
   return result;
 }
 
-function trimZerosSafe(arr) {
-  let last = arr.length - 1;
+function trimZeros(a) {
+  let i = a.length - 1;
+  while (i >= 0 && a[i].eq(0)) i--;
+  return a.slice(0, i + 1);
+}
 
-  while (last >= 0 && arr[last].eq(0)) {
-    last--;
+
+function isSuccessor(a) {
+  return a.length > 0 && !a[0].isZero();
+}
+
+function fundamentalSequence(a, n) {
+  let res = trimZeros(a.slice());
+
+  // ❌ successor → undefined
+  if (isSuccessor(res)) return undefined;
+
+  // find highest nonzero index
+  let k = res.length - 1;
+  while (k >= 0 && res[k].isZero()) k--;
+
+  if (k <= 0) return undefined; // not a limit ordinal
+
+  // Case A: coefficient > 1
+  if (res[k].gt(1)) {
+    res[k] = res[k].minus(1);
+    res[k - 1] = (res[k - 1] || new n.constructor(0)).plus(n);
+    return trimZeros(res);
   }
 
-  return arr.slice(0, last + 1);
+  // Case B: coefficient == 1
+  res[k] = new n.constructor(0);
+
+  if (k === 1) {
+    // ω → n
+    res[0] = n;
+    return trimZeros(res);
+  }
+
+  // ω^k → ω^(k-1) * n
+  res[k - 1] = n;
+  return trimZeros(res);
 }
 
 // =====================
 // Core: Extract ordinal coefficient
 // =====================
 
-function isSuccessorOrdinal(coeffs) {
-  if (!coeffs || coeffs.length === 0) return false;
-
-  return coeffs[0].gt(0);
-}
-
 function getordinal(xInput) {
   const x = new Decimal(xInput);
-
-  // outside domain → treat as ω
-  if (x.lt(0) || x.gte(3)) {
-    return [ZERO, ONE]; // ω
-  }
 
   const xn = x.div(3);
 
   const encoded = encode(xn);
 
-  const coeffs = [];
+  const coeffs = new Array(encoded[0]).fill(0).concat(1);
 
-  for (let i = 0; i < encoded.length; i++) {
-    let ai = encoded[i];
-
-    // ensure Decimal
-    if (!(ai instanceof Decimal)) {
-      ai = new Decimal(ai);
-    }
-
-    coeffs[i] = ai;
-  }
-
-  return trimZerosSafe(coeffs);
+  return encoded
 }
 
 
 // =====================
 // Formatting helpers
-// =====================
-
-// =====================
-// Term formatting
 // =====================
 
 function formatTermHTML(k, power) {
