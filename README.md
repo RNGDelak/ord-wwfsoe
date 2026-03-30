@@ -54,25 +54,9 @@ Given:
 - a fixed ordinal α
 - a sequence [a0, a1, a2, ...]
 
-We define:
+We define: a function that convert ordinal into sequence of number statisfy
 
-α[a0][a1][a2]...
-
-as shorthand for:
-
-FS(FS(FS(α)[a0])[a1])[a2]...
-
----
-
-# Interpretation
-
-Each encoded sequence represents:
-- a **path in a tree**
-- where each step selects a branch of a fundamental sequence
-
-This transforms ordinal construction into:
-
-Ordinal = Path traversal
++ Completeness : x > y then encode(x)>encode(y)
 
 ---
 
