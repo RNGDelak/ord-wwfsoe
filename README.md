@@ -56,8 +56,9 @@ Given:
 
 We define: a function that convert ordinal into sequence of number statisfy
 
-+ Completeness : x > y then encode(x)>encode(y)
++ Monotone : x > y then encode(x) > encode(y)
 
++ Complete : for all x < **fixed ordinal** , encode(x) exist
 ---
 
 # Number → Sequence Encoding
