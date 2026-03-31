@@ -1,4 +1,4 @@
-# Fundamental Sequence Ordinal Encoding
+# Fundamental Sequence Ordinal Encoding [Work in progess]
 
 This project introduces a new technique for representing and visualizing ordinal numbers:
 
@@ -52,13 +52,15 @@ Reference: https://en.wikipedia.org/wiki/Fundamental_sequence_(set_theory)
 
 Given:
 - a fixed ordinal α
-- a sequence [a0, a1, a2, ...]
+- a ordinal
 
 We define: a function that convert ordinal into sequence of number statisfy
 
 + Monotone : x > y then encode(x) > encode(y)
 
-+ Complete : for all x < **fixed ordinal** , encode(x) exist
++ Complete : for all x < **fixed ordinal** , encode(x) is defined
+
++ Uniqueness : for all x =! y , encode(x) =! encode(y)
 ---
 
 # Number → Sequence Encoding
@@ -102,8 +104,7 @@ an = floor(x / (1 - x)) (iterative)
 
 - Works with **any ordinal system**
 - Requires only:
-  - fundamental sequence definition
-  - comparator
+  
 - Avoids symbolic explosion
 - Suitable for:
   - visualization
