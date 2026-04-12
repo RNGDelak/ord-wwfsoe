@@ -80,6 +80,7 @@ We read each bit in X , one by one and start at index i
 '''
 Before Reading any bit , establish the interval [0,α]
 '''
+after an amount of step , we may call the current intervals : [α, β] for clarity
 
 #### Termination:
 we check this everytime before we do the recursive step
@@ -88,17 +89,8 @@ we check this everytime before we do the recursive step
 
 #### Recursive rules:
 
-Let g(x, α) = [L, R]
-
-- If next bit is `"0"`:
-```
-g(x + "0", α) = [L, f(L, R)]
-```
-
-- If next bit is `"1"`:
-```
-g(x + "1", α) = [f(L, R), R]
-```
+- If next bit is `"0"`, we rescale the intervals [α, β] -> [α, f(α, β)]
+- If next bit is `"1"`, we rescale the intervals [α, β] -> [f(α, β), β]
 
 ---
 
