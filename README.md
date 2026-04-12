@@ -74,7 +74,7 @@ These are **symbolic binary strings**, not standard binary expansions.
 
 ### 3. Function g(X, α)
 
-We read each bit in X , one by one and start at index i
+We read each bit in X , one by one and start at index 0 (we use 0-indexed so that it easy to implement it into code)
 
 **Start Intervals**
 '''
