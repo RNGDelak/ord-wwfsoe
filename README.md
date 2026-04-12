@@ -76,18 +76,18 @@ These are **symbolic binary strings**, not standard binary expansions.
 
 We read each bit in X , one by one and start at index 0 (we use 0-indexed so that it easy to implement it into code)
 
-**Start Intervals**
-'''
 Before Reading any bit , establish the interval [0,α]
-'''
-after an amount of step , we may call the current intervals : [α, β] for clarity
+
+After that , we start doing these step : Termination Check -> Rescale intervals -> Termination Check -> Rescale intervals ->...
+
+For clarity ,after an amount of step , we may call the current intervals : [α, β]
 
 #### Termination:
 we check this everytime before we do the recursive step
 - If β is a **limit ordinal** and the string ends → return f(α, β)  
 - If β is a **successor ordinal** → return α  
 
-#### Recursive rules:
+#### Rescale intervals:
 
 - If next bit is `"0"`, we rescale the intervals [α, β] -> [α, f(α, β)]
 - If next bit is `"1"`, we rescale the intervals [α, β] -> [f(α, β), β]
