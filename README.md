@@ -124,26 +124,26 @@ Bound ordinal : e0
 10       : 2
 101      : 3
 1011     : 4
-1        : w
-11000    : w+1
-110001   : w+2
-1100011  : w+3
-1100     : w2
-110010   : w2+1
-1100101  : w2+2
-11001011 : w2+3
-110010111: w2+4
-11001    : w3
-110011   : w4
-1100111  : w5
-110      : w^2
-1101000  : w^2 + 1
-11010001 : w^2 + 2
-110100011: w^2 + 3
-110100   : w^2 + w
-11010010 : w^2 + w + 1
-110100101: w^2 + w + 2
-1101001  : w^2 + w2
+1        : ω
+11000    : ω+1
+110001   : ω+2
+1100011  : ω+3
+1100     : ω2
+110010   : ω2+1
+1100101  : ω2+2
+11001011 : ω2+3
+110010111: ω2+4
+11001    : ω3
+110011   : ω4
+1100111  : ω5
+110      : ω^2
+1101000  : ω^2 + 1
+11010001 : ω^2 + 2
+110100011: ω^2 + 3
+110100   : ω^2 + ω
+11010010 : ω^2 + ω + 1
+110100101: ω^2 + ω + 2
+1101001  : ω^2 + ω2
 ```
 ---
 
@@ -152,4 +152,7 @@ Bound ordinal : e0
 - Real numbers in (0,1) are encoded into binary strings via **h(x)**  
 - Binary strings define a path through ordinal intervals via **g(X, α)**  
 - Fundamental sequences guide interval refinement  
-- The process yields a unique ordinal below α  
+- The process yields a unique ordinal below α
+
+## Implement
+- Check ordinal.js for the Implementation of this construction with bound ordinal ω^ω
