@@ -42,7 +42,7 @@ A **fundamental sequence** of a limit ordinal α is a sequence that approaches �
 f(α, β) = min { β[n] | β[n] > α }
 ```
 
-Returns the smallest element in β’s fundamental sequence greater than α.
+Returns the smallest element in β’s fundamental sequence which is greater than α.
 
 ---
 
