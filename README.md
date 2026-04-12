@@ -74,13 +74,15 @@ These are **symbolic binary strings**, not standard binary expansions.
 
 ### 3. Function g(X, α)
 
-**Base case:**
-```
-g("", α) = [0, α]
-```
+We read each bit in X , one by one and start at index i
+
+**Start Intervals**
+'''
+Before Reading any bit , establish the interval [0,α]
+'''
 
 #### Termination:
-
+we check this everytime before we do the recursive step
 - If β is a **limit ordinal** and the string ends → return f(α, β)  
 - If β is a **successor ordinal** → return α  
 
@@ -108,26 +110,51 @@ g(x + "1", α) = [f(L, R), R]
 ### Steps
 
 ```
-[0, ε₀]
-→ [1, ε₀]
-→ [ω, ε₀]
-→ [ω^ω, ε₀]
-→ [ω^ω, ω^(ω^ω)]
-→ [ω^(ω²), ω^(ω^ω)]
-→ [ω^(ω³), ω^(ω^ω)]
-→ [ω^(ω³), ω^(ω⁴)]
-→ [ω^(ω³), ω^(ω³·2)]
-→ [ω^(ω³ + ω²), ω^(ω³·2)]
-```
-
----
-
-## Final Result
+Intialize : [0, ε₀]
+1 → [1, ε₀] 
+1 → [ω, ε₀]
+1 → [ω^ω, ε₀]
+0 → [ω^ω, ω^(ω^ω)]
+1 → [ω^(ω²), ω^(ω^ω)]
+1 → [ω^(ω³), ω^(ω^ω)]
+0 → [ω^(ω³), ω^(ω⁴)]
+0 → [ω^(ω³), ω^(ω³·2)]
+1 → [ω^(ω³ + ω²), ω^(ω³·2)] // Binary string ends, caught termination rule 1
+Final Result : ω^(ω^3 + ω^2·2)
 
 ```
-ω^(ω^3 + ω^2·2)
-```
 
+*You may also analyse some yourself too!*
+*If you can analyse these correct example correctly, you have understand it!*
+
+```
+Bound ordinal : e0
+0        : 0
+''       : 1
+10       : 2
+101      : 3
+1011     : 4
+1        : w
+11000    : w+1
+110001   : w+2
+1100011  : w+3
+1100     : w2
+110010   : w2+1
+1100101  : w2+2
+11001011 : w2+3
+110010111: w2+4
+11001    : w3
+110011   : w4
+1100111  : w5
+110      : w^2
+1101000  : w^2 + 1
+11010001 : w^2 + 2
+110100011: w^2 + 3
+110100   : w^2 + w
+11010010 : w^2 + w + 1
+110100101: w^2 + w + 2
+1101001  : w^2 + w2
+```
 ---
 
 ## Summary
