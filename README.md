@@ -53,9 +53,7 @@ For 0 < x < 1:
 - If x < k → `"0" + h(x/k)`
 - If x = k → `""` (empty string)
 - If x > k → `"1" + h((x - k)/(1 - k))`
-
-Typically k = 1/2.
-
+this works for all k that 0 < k < 1
 These are **symbolic binary strings**, not standard binary expansions.
 
 #### Examples (k = 1/2)
