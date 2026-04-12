@@ -1,123 +1,138 @@
-# Fundamental Sequence Ordinal Encoding [Work in progess]
+# Fundamental Sequence Ordinal Encoding
 
-This project introduces a new technique for representing and visualizing ordinal numbers:
-
-> **Fundamental Sequence Ordinal Encoding (FSOE)**
-
-The goal is to provide a **general, system-independent way** to encode ordinals using only:
-- a **fundamental sequence definition**
-- an **ordinal comparator**
+*Original idea by @solarzone, explained by @rngdelak*
 
 ---
 
-# Motivation
+## Overview
 
-There are many existing ways to represent ordinals:
-- Direct symbolic notation (e.g. Cantor normal form)
-- Algebraic constructions
-- Binary / tree encodings
+This document introduces a uniform method to encode ordinals using three core functions:
 
-While these methods work, they often:
-- become **complex for large ordinals**
-- are **hard to visualize**
-- are **not uniform across systems**
+- **FS(α, n)** → Returns the n-th element of the fundamental sequence of ordinal α  
+- **is_successor(α)** → True if α is a successor ordinal, False if limit ordinal  
+- **cmp(α, β)** → Comparison function (-1 if α < β, 0 if equal, 1 if α > β)
+
+**Prerequisite:** Familiarity with ordinal numbers up to Γ₀.
 
 ---
 
-# Core Idea
+## I. Key Concepts
 
-Instead of writing ordinals symbolically, we represent them as a **sequence of integers**:
+A **fundamental sequence** of a limit ordinal α is a sequence that approaches α from below.
 
-[a0, a1, a2, a3, ...]
+**Notation:**
+- FS(α): the sequence  
+- α[n]: the n-th element (0-indexed)
 
-This sequence describes a **path of successive fundamental sequence expansions** starting from a fixed ordinal.
+### Examples
 
----
+- FS(ε₀) = {1, ω, ω^ω, ω^(ω^ω), ...}  
+  → ε₀[3] = ω^(ω^ω)
 
-# Fundamental Sequence
-
-A **fundamental sequence** assigns to each limit ordinal α a sequence:
-
-FS(α)[0], FS(α)[1], FS(α)[2], ...
-
-such that:
-- FS(α)[n] < α
-- FS(α)[n] → α as n → ∞
-
-Reference: https://en.wikipedia.org/wiki/Fundamental_sequence_(set_theory)
+- FS(ω^ω) = {1, ω, ω², ω³, ...}  
+  → ω^ω[3] = ω³
 
 ---
 
-# Ordinal Encoding
+## II. Core Definitions
 
-Given:
-- a fixed ordinal α
-- a ordinal
+### 1. Function f(α, β)
 
-We define: a function that convert ordinal into sequence of number statisfy
+```
+f(α, β) = min { β[n] | β[n] > α }
+```
 
-+ Monotone : x > y then encode(x) > encode(y)
-
-+ Complete : for all x < **fixed ordinal** , encode(x) is defined
-
-+ Uniqueness : for all x =! y , encode(x) =! encode(y)
----
-
-# Number → Sequence Encoding
-
-To map real numbers (e.g. positions on a line) into sequences, we encode:
-
-x ∈ (0,1) → [a0, a1, a2, ...]
-
-Two approaches are currently implemented:
+Returns the smallest element in β’s fundamental sequence greater than α.
 
 ---
 
-### 1. Log-based Encoding
+### 2. Encoding Real Numbers into Binary Strings (h(x))
 
-an = floor(log_{2/3}(1 - x)) (iterative)
+For 0 < x < 1:
 
-- Produces **self-similar / fractal structure**
-- Computationally expensive
+- If x < k → `"0" + h(x/k)`
+- If x = k → `""` (empty string)
+- If x > k → `"1" + h((x - k)/(1 - k))`
 
----
+Typically k = 1/2.
 
-### 2. Rational Encoding
+These are **symbolic binary strings**, not standard binary expansions.
 
-an = floor(x / (1 - x)) (iterative)
+#### Examples (k = 1/2)
 
-- Very fast
-- Breaks self-similarity
-
----
-
-# Tradeoffs
-
-| Method        | Speed | Structure        |
-|--------------|------|-----------------|
-| Log-based     | Slow | Fractal-like     |
-| Rational      | Fast | Distorted        |
-
----
-
-# Features
-
-- Works with **any ordinal system**
-- Requires only:
-  
-- Avoids symbolic explosion
-- Suitable for:
-  - visualization
-  - procedural generation
-  - ordinal exploration
+| x   | h(x) |
+|-----|------|
+| 1/8 | "00" |
+| 1/4 | "0"  |
+| 3/8 | "01" |
+| 1/2 | ""   |
+| 5/8 | "10" |
+| 3/4 | "1"  |
+| 7/8 | "11" |
 
 ---
 
-# 📂 Implementation
+### 3. Function g(X, α)
 
-See: ord-wwfsoe
+**Base case:**
+```
+g("", α) = [0, α]
+```
 
-Current implementation supports:
-- fixed ordinal: ω^ω
-- sequence encoding / decoding
-- expansion logic
+#### Termination:
+
+- If β is a **limit ordinal** and the string ends → return f(α, β)  
+- If β is a **successor ordinal** → return α  
+
+#### Recursive rules:
+
+Let g(x, α) = [L, R]
+
+- If next bit is `"0"`:
+```
+g(x + "0", α) = [L, f(L, R)]
+```
+
+- If next bit is `"1"`:
+```
+g(x + "1", α) = [f(L, R), R]
+```
+
+---
+
+## III. Example Evaluation
+
+**Binary string:** `111011001`  
+**Ordinal bound:** ε₀
+
+### Steps
+
+```
+[0, ε₀]
+→ [1, ε₀]
+→ [ω, ε₀]
+→ [ω^ω, ε₀]
+→ [ω^ω, ω^(ω^ω)]
+→ [ω^(ω²), ω^(ω^ω)]
+→ [ω^(ω³), ω^(ω^ω)]
+→ [ω^(ω³), ω^(ω⁴)]
+→ [ω^(ω³), ω^(ω³·2)]
+→ [ω^(ω³ + ω²), ω^(ω³·2)]
+```
+
+---
+
+## Final Result
+
+```
+ω^(ω^3 + ω^2·2)
+```
+
+---
+
+## Summary
+
+- Real numbers in (0,1) are encoded into binary strings via **h(x)**  
+- Binary strings define a path through ordinal intervals via **g(X, α)**  
+- Fundamental sequences guide interval refinement  
+- The process yields a unique ordinal below α  
