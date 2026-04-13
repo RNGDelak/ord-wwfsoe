@@ -64,246 +64,209 @@ function toOrdinal(coeffs) {}
 function classifyOrdinal(coeffs) {}
 
 
-/* =========================
-   Helpers
-========================= */
 
-function D(x) {
-    return new Decimal(x);
+// =======================
+// Helpers
+// =======================
+
+function normalize(a) {
+  let res = [...a];
+  while (res.length > 1 && res[res.length - 1] === 0) {
+    res.pop();
+  }
+  return res;
 }
 
-function isZero(x) {
-    if (x instanceof Decimal) return x.isZero();
-    return new Decimal(x).isZero();
-}
-
-function trim(a) {
-    let i = a.length - 1;
-
-    while (i >= 0 && isZero(a[i])) i--;
-
-    return a.slice(0, i + 1);
-}
-function clone(a) {
-    return a.map(x => new Decimal(x));
-}
-
-function zeroArray(n) {
-    let arr = [];
-    for (let i = 0; i < n; i++) arr.push(D(0));
-    return arr;
-}
-
-/* =========================
-   1. is_successor
-========================= */
+// =======================
+// is_successor
+// =======================
 
 function is_successor(alpha) {
-    alpha = trim(alpha);
-    if (alpha.length === 0) return false; // 0
-    return !alpha[0].isZero();
+  if (typeof alpha === "string") return false;
+  return (alpha[0] || 0) > 0;
 }
 
-/* =========================
-   2. cmp
-========================= */
+// =======================
+// cmp
+// =======================
 
-function cmp(alpha, beta) {
-    alpha = trim(alpha);
-    beta = trim(beta);
+function cmp(a, b) {
+  if (typeof a === "string" && typeof b === "string") {
+    return a === b ? 0 : (a === "w^w" ? 1 : -1);
+  }
+  if (typeof a === "string") return 1;
+  if (typeof b === "string") return -1;
 
-    if (alpha.length > beta.length) return 1;
-    if (alpha.length < beta.length) return -1;
+  let maxLen = Math.max(a.length, b.length);
 
-    for (let i = alpha.length - 1; i >= 0; i--) {
-        if (alpha[i].gt(beta[i])) return 1;
-        if (alpha[i].lt(beta[i])) return -1;
-    }
+  for (let i = maxLen - 1; i >= 0; i--) {
+    let ai = a[i] || 0;
+    let bi = b[i] || 0;
 
-    return 0;
+    if (ai < bi) return -1;
+    if (ai > bi) return 1;
+  }
+  return 0;
 }
 
-/* =========================
-   3. FS (Fundamental Sequence)
-========================= */
+// =======================
+// FS (Fundamental Sequence)
+// =======================
 
 function FS(alpha, n) {
-    // ===== SPECIAL CASE: ω^ω =====
-    if (alpha === "w^w") {
-        let res = [];
-        for (let i = 0; i < n; i++) {
-            res.push(D(0));
-        }
-        res.push(D(1)); // ω^n
-        return res;
+  // ω^ω
+  if (alpha === "w^w") {
+    let arr = Array(n + 1).fill(0);
+    arr[n] = 1;
+    return arr;
+  }
+
+  // successor
+  if (is_successor(alpha)) {
+    let res = [...alpha];
+    res[0]--;
+    return normalize(res);
+  }
+
+  // find smallest nonzero index
+  let m = -1;
+  for (let i = 0; i < alpha.length; i++) {
+    if (alpha[i] !== 0) {
+      m = i;
+      break;
     }
+  }
 
-    // ===== EXISTING LOGIC =====
-    alpha = trim(alpha);
+  if (m === -1) return [0];
 
-    if (alpha.length === 0) return [];
+  let res = [...alpha];
 
-    if (is_successor(alpha)) {
-        throw new Error("FS only defined for limit ordinals");
-    }
+  // decrease a_m
+  res[m]--;
 
-    let k = alpha.length - 1;
-    let coeff = alpha[k];
-    let res = clone(alpha);
+  // move to lower level
+  if (m > 0) {
+    res[m - 1] = n;
+  }
 
-    if (coeff.eq(1)) {
-        res[k] = D(0);
-
-        if (k === 0) {
-            return [D(n)];
-        }
-
-        if (!res[k - 1]) res[k - 1] = D(0);
-        res[k - 1] = res[k - 1].plus(n);
-
-        return trim(res);
-    } else {
-        res[k] = coeff.minus(1);
-
-        if (!res[k - 1]) res[k - 1] = D(0);
-        res[k - 1] = res[k - 1].plus(n);
-
-        return trim(res);
-    }
+  return normalize(res);
 }
 
-/* =========================
-   4. f(α, β)
-========================= */
+// =======================
+// f(α, β)
+// =======================
 
 function f(alpha, beta) {
-    let n = 0;
-
-    while (true) {
-        let candidate = FS(beta, n);
-        if (cmp(candidate, alpha) === 1) {
-            return candidate;
-        }
-        n++;
+  let n = 0;
+  while (true) {
+    let candidate = FS(beta, n);
+    if (cmp(candidate, alpha) === 1) {
+      return candidate;
     }
+    n++;
+  }
 }
 
-/* =========================
-   5. h(x) with dynamic limit
-========================= */
+// =======================
+// g(X, α)
+// =======================
 
-function h(x, k = D(0.5)) {
-    x = new Decimal(x);
-    k = new Decimal(k);
+function g(X, bound) {
+  let alpha = [0]; // 0
+  let beta = bound;
 
-    let precision = Decimal.precision;
+  let i = 0;
 
-    // log_k(10) = ln(10)/ln(k)
-    let logk10 = Decimal.ln(10).div(Decimal.ln(k));
-
-    let limit = precision
-
-    let result = "";
-    let steps = 0;
-
-    while (x.gt(0) && x.lt(1) && steps < limit) {
-        if (x.lt(k)) {
-            result += "0";
-            x = x.div(k);
-        } else if (x.eq(k)) {
-            break;
-        } else {
-            result += "1";
-            x = x.minus(k).div(D(1).minus(k));
-        }
-        steps++;
+  while (true) {
+    // termination
+    if (i >= X.length) {
+      if (!is_successor(beta)) {
+        return f(alpha, beta);
+      } else {
+        return alpha;
+      }
     }
 
-    return result;
-}
-
-/* =========================
-   6. g(X, α)
-========================= */
-
-function g(X, alpha) {
-    let left = [];               // 0
-    let right = trim(alpha);
-
-    let i = 0;
-
-    while (true) {
-        // termination BEFORE reading next bit
-        if (i >= X.length) {
-            if (!is_successor(right)) {
-                return f(left, right);
-            } else {
-                return left;
-            }
-        }
-
-        if (is_successor(right)) {
-            return left;
-        }
-
-        let mid = f(left, right);
-        let bit = X[i];
-
-        if (bit === "0") {
-            right = mid;
-        } else {
-            left = mid;
-        }
-
-        i++;
-    }
-}
-
-/* =========================
-   Utilities (Optional)
-========================= */
-
-// Pretty print ordinal
-function show(alpha) {
-    alpha = trim(alpha);
-    if (alpha.length === 0) return "0";
-
-    let terms = [];
-
-    for (let i = alpha.length - 1; i >= 0; i--) {
-        let c = alpha[i];
-        if (c.isZero()) continue;
-
-        if (i === 0) {
-            terms.push(c.toString());
-        } else if (c.eq(1)) {
-            terms.push(`ω^${i}`);
-        } else {
-            terms.push(`${c.toString()}·ω^${i}`);
-        }
+    if (is_successor(beta)) {
+      return alpha;
     }
 
-    return terms.join(" + ");
+    let mid = f(alpha, beta);
+    let bit = X[i];
+
+    if (bit === "0") {
+      beta = mid;
+    } else {
+      alpha = mid;
+    }
+
+    i++;
+  }
 }
 
-/* =========================
-   Example
-========================= */
+// =======================
+// h(x)  (real → binary string)
+// =======================
 
-// ω = [0,1]
-const omega = [D(0), D(1)];
+function h(x, k = 0.5, depth = 50) {
+  const EPS = 1e-12;
 
-// ω^2 = [0,0,1]
-const omega2 = [D(0), D(0), D(1)];
+  if (depth <= 0) return "";
 
-// Example binary string
-let X = "110010";
+  if (Math.abs(x - k) < EPS) {
+    return "";
+  }
 
-// Run g
-let result = g(X, omega2);
+  if (x < k) {
+    return "0" + h(x / k, k, depth - 1);
+  } else {
+    return "1" + h((x - k) / (1 - k), k, depth - 1);
+  }
+}
 
-console.log("Binary:", X);
-console.log("Ordinal:", show(result));
+// =======================
+// Pretty print (optional)
+// =======================
 
-let x = D(0.625);
-console.log("h(x):", h(x));
+function toString(alpha) {
+  if (alpha === "w^w") return "ω^ω";
+
+  let terms = [];
+  for (let i = alpha.length - 1; i >= 0; i--) {
+    let c = alpha[i];
+    if (!c) continue;
+
+    if (i === 0) {
+      terms.push(c.toString());
+    } else if (i === 1) {
+      terms.push(c === 1 ? "ω" : c + "ω");
+    } else {
+      terms.push(c === 1 ? `ω^${i}` : `${c}ω^${i}`);
+    }
+  }
+
+  return terms.length ? terms.join(" + ") : "0";
+}
+
+// =======================
+// Examples
+// =======================
+
+// h(x)
+console.log(h(1/8)); // "00"
+console.log(h(3/8)); // "01"
+
+// g(X, ω^ω)
+let X = "110";
+let result = g(X, "w^w");
+
+console.log(X, "→", result, "=", toString(result));
+
+// full pipeline
+let x = 3/8;
+let bin = h(x);
+let ord = g(bin, "w^w");
+
+console.log("x =", x);
+console.log("h(x) =", bin);
+console.log("ordinal =", toString(ord));
