@@ -157,5 +157,8 @@ Bound ordinal : e0
 - Fundamental sequences guide interval refinement  
 - The process yields a unique ordinal below α
 
+## After reading
+- Come back to readme.md to know the additional requirement of 3 function that i have listed
+
 ## Implement
 - Check ordinal.js for the Implementation of this construction with bound ordinal ω^ω
